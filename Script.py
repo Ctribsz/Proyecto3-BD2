@@ -25,33 +25,47 @@ def get_adyacencias(puzzle_id):
             for rec in result
         }
 
-def imprimir_desde_pieza(pieza_inicio, adyacencias):
+def imprimir_desde_pieza(pieza_inicio, adyacencias, piezas_faltantes):
     visitadas = set()
     procesadas = set()
 
     def dfs(pieza):
-        if pieza in visitadas:
+        if pieza in visitadas or pieza in piezas_faltantes:
             return
         visitadas.add(pieza)
 
-        print(f"Pieza {pieza}:")
+        print(f"\nPieza {pieza}:")
         for a in adyacencias.get(pieza, []):
             vecino = a['vecino']
             if vecino is None:
                 continue
+
             tupla_relacion = tuple(sorted([pieza, vecino])) + (a['mi_lado'], a['lado_vecino'])
 
-            if tupla_relacion not in procesadas:
-                print(f"  • está unido con la pieza {vecino} (desde el lado {a['mi_lado']} hacia el lado {a['lado_vecino']} de la otra pieza)")
-                procesadas.add(tupla_relacion)
+            if tupla_relacion in procesadas:
+                continue
 
-            dfs(vecino)
+            procesadas.add(tupla_relacion)
+
+            if vecino in piezas_faltantes:
+                print(f" -- La pieza {vecino} está faltando. Se omite esta conexión.")
+                for salto in adyacencias.get(vecino, []):
+                    siguiente = salto['vecino']
+                    if siguiente and siguiente not in piezas_faltantes and siguiente not in visitadas:
+                        dfs(siguiente)
+            else:
+                print(f"  • está unido con la pieza {vecino} (desde el lado {a['mi_lado']} hacia el lado {a['lado_vecino']} de la otra pieza)")
+                dfs(vecino)
 
     dfs(pieza_inicio)
 
 if __name__ == "__main__":
     puzzle_id = input("ID del rompecabezas (ej. R1): ")
     pieza_inicio = input("ID de la pieza inicial (ej. R1_1): ")
+
+    piezas_faltantes_input = input("Piezas faltantes (separadas por coma, ej. R1_3,R1_5): ")
+    piezas_faltantes = set(p.strip() for p in piezas_faltantes_input.split(",") if p.strip())
+
     adyacencias = get_adyacencias(puzzle_id)
-    imprimir_desde_pieza(pieza_inicio, adyacencias)
+    imprimir_desde_pieza(pieza_inicio, adyacencias, piezas_faltantes)
     driver.close()
