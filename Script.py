@@ -1,9 +1,5 @@
 from neo4j import GraphDatabase, basic_auth
 
-URI      = "neo4j+s://30fb3bfe.databases.neo4j.io"
-USER     = "neo4j"
-PASSWORD = "WzIvJUHbQVV8t0WhzMS6TwiQyI_iLlimQ_bqUBGDijQ"
-
 driver = GraphDatabase.driver(URI, auth=basic_auth(USER, PASSWORD))
 
 def get_adyacencias(puzzle_id):
