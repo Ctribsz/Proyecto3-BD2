@@ -45,7 +45,10 @@ class ArmadorRompecabezas:
             if not vecino:
                 continue
 
-            key = tuple(sorted([pieza, vecino])) + (a['mi_lado'], a['lado_vecino'])
+            key = (
+                  frozenset([pieza, vecino]),
+                  tuple(sorted([a['mi_lado'], a['lado_vecino']]))
+            )
             if key in self.procesadas:
                 continue
             self.procesadas.add(key)
